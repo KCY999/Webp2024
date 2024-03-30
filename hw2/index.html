@@ -79,7 +79,6 @@
                     showData(default_dataset,nowDataOrder);
                     //console.log(default_dataset[0]);
 
-                    
                     totalPage = Math.ceil(default_dataset.length / 10) ;  // 初始化 total page
                     //console.log(totalPage); 
                     //console.log(default_dataset.length);
@@ -87,19 +86,25 @@
                     nowPageShow();
                 }
             }
-            
-
-            
-            
-            // show 10 rows datas
+                    
+            // show rows datas (limit 10 rows)
             function showData(dataset,dataOrder){
+
+                rmRow(); // remove all rows first
+
+                if(dataset.length==0){
+                    //console.log("showData(): break")
+                    this.break;
+                }
+
                 let i;
-                if( dataOrder+10 >= dataset.length){
+                if( dataOrder+10 >= dataset.length ){
                     for(i=dataOrder;i<dataset.length;i++){
                         var row = table.insertRow(-1);
                         row.insertCell(0).innerHTML = dataset[i]['title'];
                         row.insertCell(1).innerHTML = dataset[i]['showInfo'][0]['location'];
                         row.insertCell(2).innerHTML = dataset[i]['showInfo'][0]['price'];
+                        //console.log("add1");
                     }
                 }else{
                     for(i=dataOrder;i<dataOrder+10;i++){
@@ -107,16 +112,23 @@
                         row.insertCell(0).innerHTML = dataset[i]['title'];
                         row.insertCell(1).innerHTML = dataset[i]['showInfo'][0]['location'];
                         row.insertCell(2).innerHTML = dataset[i]['showInfo'][0]['price'];
+                        //console.log("add2");
                     }
                 }     
             }
 
-            // remove rows 
-            function reRow(){
-                let i;
-                for(i=1;i<table.rows.length;i++){
+            // remove all rows 
+            function rmRow(){
+                // console.log(table.rows.length);
+                let delNum = table.rows.length; // table.rows.length 做為要刪除的row數量，要先存下來。
+                let i;                          // 因為在執行刪除迴圈時，table.rows.length這個數也會隨著row的數量減少而改變
+                // 從最下面的row開始刪，可因避免row減少，而使row編號向下遞移的問題。
+                for(i=delNum-1;i>=1;i--){  
                     var row = table.rows[i];
-                    row.parentNode.removeChild(row);
+                    //console.log(row.parentNode); tbody(?)
+                    //console.log(document.body.table == row.parentNode); fasle
+                    row.parentNode.removeChild(row); // 在row的父節點中，刪除其中的子元素row (刪除row)
+                    // console.log(table.rows.length); PROVE THAT: table.rows.length因刪除row而持續變化
                 }
             }
             
@@ -127,7 +139,6 @@
                     this.break;
                 }
                 else{
-                    reRow();
                     nowDataOrder += 10;
                     showData(using_dataset,nowDataOrder);
                     nowPageShow();
@@ -141,7 +152,6 @@
                     this.break;
                 }
                 else{
-                    reRow();
                     nowDataOrder -= 10;
                     showData(using_dataset,nowDataOrder);
                     nowPageShow();
@@ -153,7 +163,7 @@
             var showPage = document.getElementById("showPage");
             function nowPageShow(){
                 nowPageOrder = 1 + nowDataOrder/10 ;
-                totalPage = Math.ceil(using_dataset.length / 10) ;
+                totalPage = (using_dataset.length / 10) == 0 ? 1 : Math.ceil(using_dataset.length / 10) ;  // Notice the stitu that using_dataset == null.
                 showPage.textContent = ` ${nowPageOrder}/${totalPage}頁 `;
             }; 
 
@@ -165,46 +175,39 @@
             // ____EX: inkw.onchange = function(){console.log(this.value);}
  
             inkw.addEventListener("change",function(){  // notice that: 在addEventListener中，要用"change"，不是"onchange"
-                console.log(this.value);
+                //console.log( "this.value= " + this.value );
                 //console.log(typeof this.value);
                 //console.log(default_dataset[0]['title'].indexOf(this.value));
                 
                 
                 let kw = this.value; // key word  
                 // PS:此處要先將kw的值(結果)存下來，才能在下面帶進.filter(function(data){})中，
-                                
-                reRow();
+                console.log( "kw= " + kw );
+                
+                
                 nowDataOrder = 0;
                 nowPageOrder = 1;
                 
 
-                if( !kw || kw === ''){
+                if( kw === '' ){
                     using_dataset = default_dataset;
                     showData(using_dataset,nowDataOrder);
                     nowPageShow();
                 }else{
-                    // 篩選
+                    // 篩選 .filter(function(item))
                     using_dataset = default_dataset.filter(function(data){
+                    // something that kw is included    
                     let is_kwIncluded = data['title'].includes(kw) || data['showInfo'][0]['location'].includes(kw) || data['showInfo'][0]['price'].includes(kw) ;
-                    console.log(is_kwIncluded);
+                    // console.log(is_kwIncluded);
                     return is_kwIncluded ;
                     });                    
-                    console.log(using_dataset);
-
+                    // console.log(using_dataset);
+                    // console.log(typeof using_dataset);
                     showData(using_dataset,nowDataOrder);
                     nowPageShow();
                 }
-                
             });
 
         </script>
     </body>
 </html>
-
-
-
-
-
-
-
-

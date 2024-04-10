@@ -43,32 +43,43 @@
                 xhr.open('GET',imglist_Url,true);
                 xhr.send();
                 xhr.onload = function(){
-                    var imglist_set = JSON.parse(this.responseText); 
-                    console.log(imglist_set['photos']['photo']);
-                    add_new_img(imglist_set['photos']['photo']);
+                    
+                    var allInfo = JSON.parse(this.responseText); // allInfo : 該API內所有的資訊
+                    console.log(allInfo['photos']['photo']);
+
+                    var imgInfo_set = allInfo['photos']['photo'];  // allInfo['photos']['photo'] : 存放圖片資訊(含圖片id)的 Array 組 (自己亦是array)
+                    console.log(imgInfo_set);
+
+                    add_new_img(imgInfo_set);  
                 }
             }
             
             
-            function add_new_img(imglist){
-                console.log(imglist);
-                var gal = document.getElementById("gallery");
+            function add_new_img(imgInfo_set){
+                console.log(imgInfo_set);                
                 
-                imglist.forEach( function(item) {
-                    console.log(item);                    
-                    console.log(item.id);
-                    console.log(item['id']);
+                imgInfo_set.forEach( function(imgInfo) {
+                    console.log(imgInfo);                    
+                    console.log(imgInfo.id);
+                    console.log(imgInfo['id']);
 
-                    var id = item.id;
+                    var id = imgInfo.id; // 取的個別imgInfo中的id => 取每張圖片各自的id
+                    // 用每張圖片各自的id，去取的他們專屬的API_URL (內有圖片source等資料)
                     var img_Url =  
                         `https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&api_key=ca370d51a054836007519a00ff4ce59e&photo_id=${id}&format=json&nojsoncallback=1`;
+                    
+                    // 打API => for 取得圖片source(圖片本身)
                     var img_xhr = new XMLHttpRequest();
                     img_xhr.open('GET',img_Url,true);
                     img_xhr.send();
                     img_xhr.onload = function(){
-                        var imgData = JSON.parse(this.responseText);
+                        var imgData = JSON.parse(this.responseText); // 含有該圖片source的資料
+                        var imgSource = imgData.sizes.size[3].source; //  取資料中的"圖片source"   PS: size[3] is for "small".
+                        
+                        // 在網站上顯示/建立圖片
+                        var gal = document.getElementById("gallery");
                         var img = document.createElement("img");
-                        img.setAttribute("src",imgData.sizes.size[3].source); // size[3] is "small"
+                        img.setAttribute("src",imgSource); 
                         gal.appendChild(img);
                     }
 

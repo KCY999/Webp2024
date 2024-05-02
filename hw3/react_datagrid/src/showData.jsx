@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { DataGrid } from '@material-ui/data-grid';
+import 'react-data-grid/lib/styles.css';
+
+import DataGrid from 'react-data-grid';
 
 const columns = [
-    { field: 'name', headerName: '名稱', width: 600 },
-    { field: 'site', headerName: '地點', width: 600},
-    { field: 'price', headerName: '票價', width: 300},
+    { key: 'name', name: '名稱', width: 600 },
+    { key: 'site', name: '地點', width: 600},
+    { key: 'price', name: '票價', width: 300},
 ];
 
 const ShowData = ()=>{
@@ -29,7 +31,7 @@ const ShowData = ()=>{
     return(
         <>
         <h1>觀光景點</h1>
-        <div style={{ height: 700, width: '100%' }}>
+        <div style={{ height: 1000, width: '100%' }}>
             <DataGrid rows={row} columns={columns} pageSize={10}  /> 
         </div> 
         </>
